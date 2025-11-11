@@ -24,6 +24,35 @@ goal navigation without additional data collection or model finetuning.
 
 Try VLMaps creation and landmark indexing in [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1xsH9Gr_O36sBZaoPNq1SmqgOOF12spV0?usp=sharing)
 
+## Docker (CUDA + Miniconda) Quickstart
+
+If you have an NVIDIA GPU and the NVIDIA Container Toolkit installed, you can run VLMaps in a container with a preconfigured CUDA + Miniconda setup. This persists your dataset and caches to speed up iterations.
+
+```bash
+# 1) Ensure NVIDIA Container Toolkit is installed
+#    https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+
+# 2) Build the image (first time only)
+docker compose -f docker-compose.yml build
+
+# 3) Start the dev container (runs in background)
+docker compose -f docker-compose.yml up -d
+
+# 4) Enter the container (conda env 'vlmaps' is auto-activated)
+docker compose -f docker-compose.yml exec vlmaps bash
+
+# 5) Your repo is at /workspace/vlmaps, dataset is mounted at /dataset
+#    Example: run an app module
+cd /workspace/vlmaps/application
+python create_map.py
+```
+
+Notes:
+- The `./dataset` directory on your host is bind-mounted to `/dataset` inside the container. Place or download datasets into `./dataset` to persist them.
+- Conda installation, pip cache, and HuggingFace cache persist via named volumes to speed up rebuilds.
+- The container starts with `sleep infinity`; use `exec bash` to get an interactive shell.
+- Files created inside the container will use your host UID/GID to avoid permission issues.
+
 ## Dependencies installation
 
 To begin on your own machine, clone this repository locally
