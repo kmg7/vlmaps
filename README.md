@@ -52,6 +52,35 @@ Notes:
 - Conda installation, pip cache, and HuggingFace cache persist via named volumes to speed up rebuilds.
 - The container starts with `sleep infinity`; use `exec bash` to get an interactive shell.
 - Files created inside the container will use your host UID/GID to avoid permission issues.
+- The compose file also spins up an `llm` service that runs [Ollama](https://ollama.com/) with an OpenAI-compatible API for local language reasoning.
+
+### Local LLM (optional but recommended)
+
+The default compose setup includes an `llm` container that exposes an OpenAI-compatible HTTP endpoint at `http://llm:11434/v1`. This lets VLMaps use a local model instead of paid OpenAI endpoints.
+
+```bash
+# Pull the desired model once (e.g. mistral) after the services are up
+docker compose -f docker-compose.yml exec llm ollama pull mistral
+
+# You can run prompts directly to test
+docker compose -f docker-compose.yml exec llm ollama run mistral "Summarize VLMaps in one sentence."
+```
+
+When using the default compose environment, VLMaps containers automatically:
+- Set `OPENAI_API_BASE=http://llm:11434/v1`
+- Use `OPENAI_CHAT_MODEL=mistral`
+- Use `OPENAI_COMPLETION_MODEL=mistral`
+
+To change models or point to a different server, set the following environment variables before running `docker compose` (or place them in a `.env` file):
+
+| Purpose | Variable | Default |
+| --- | --- | --- |
+| API base URL | `VLMAPS_LLM_API_BASE` | `http://llm:11434/v1` |
+| API key (if required) | `VLMAPS_LLM_API_KEY` | `ollama` |
+| Chat completions model | `VLMAPS_LLM_CHAT_MODEL` | `mistral` |
+| Legacy completions model | `VLMAPS_LLM_COMPLETION_MODEL` | `mistral` |
+
+Any OpenAI-compatible server (vLLM, TGI, LM Studio, llama.cpp, etc.) can be used by pointing these variables to the appropriate host/model. Leave them unset to fall back to the hosted OpenAI API (requires `OPENAI_KEY`).
 
 ## Dependencies installation
 

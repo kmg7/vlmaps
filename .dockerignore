@@ -35,5 +35,6 @@ Thumbs.db
 # Large or local-only dirs (data is bind-mounted explicitly)
 data/
 media/
+models/
 
 
