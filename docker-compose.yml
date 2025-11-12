@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  vlmaps:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        PYTHON_VERSION: "3.10"
+    image: vlmaps:cuda-conda
+    container_name: vlmaps_dev
+    working_dir: /workspace/vlmaps
+    # Map current user so created files aren't root-owned
+    user: "${UID:-1000}:${GID:-1000}"
+    shm_size: "16g"
+    depends_on:
+      - llm
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - CONDA_DEFAULT_ENV=vlmaps
+      - OPENAI_API_BASE=${VLMAPS_LLM_API_BASE:-http://llm:11434/v1}
+      - OPENAI_KEY=${VLMAPS_LLM_API_KEY:-ollama}
+      - OPENAI_CHAT_MODEL=${VLMAPS_LLM_CHAT_MODEL:-mistral}
+      - OPENAI_COMPLETION_MODEL=${VLMAPS_LLM_COMPLETION_MODEL:-mistral}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+    volumes:
+      # Project workspace
+      - .:/workspace/vlmaps:cached
+      # Persistent datasets on host (create ./dataset if it doesn't exist)
+      - ./dataset:/dataset
+      # Persist conda and caches across rebuilds for faster iterations
+      - vlmaps_conda:/opt/conda
+      - vlmaps_pip:/root/.cache/pip
+      - vlmaps_hf:/root/.cache/huggingface
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    command: ["sleep", "infinity"]
+
+  llm:
+    image: ollama/ollama:latest
+    container_name: vlmaps_llm
+    restart: unless-stopped
+    shm_size: "16g"
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+
+volumes:
+  vlmaps_conda:
+  vlmaps_pip:
+  vlmaps_hf:
+
+
