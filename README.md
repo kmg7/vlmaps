@@ -10,6 +10,16 @@
 
 [Chenguang Huang](http://www2.informatik.uni-freiburg.de/~huang/), [Oier Mees](https://www.oiermees.com/), [Andy Zeng](https://andyzeng.github.io/), [Wolfram Burgard](http://www2.informatik.uni-freiburg.de/~burgard)
 
+## 📚 Documentation
+
+**For team members and contributors**: Comprehensive documentation is available in the [`docs/`](docs/) directory:
+
+- **[Architecture Documentation](docs/ARCHITECTURE.md)** - Complete guide to VLMAPS architecture, LSEG integration, LLM integration, and all major components
+- **[Quick Reference Guide](docs/QUICK_REFERENCE.md)** - Fast lookup for code locations and common tasks
+- **[Documentation Index](docs/README.md)** - Overview of all available documentation
+
+**New to the codebase?** Start with the [Architecture Documentation](docs/ARCHITECTURE.md) to understand how everything works together.
+
 We present **VLMAPs** (**V**isual **L**anguage **Maps**),  a spatial map representation in which pretrained visuallanguage model features are fused into a 3D reconstruction of the physical
 world. Spatially anchoring visual language features enables *natural language indexing in the map*, which can be used to, e.g., localize landmarks
 or spatial references with respect to landmarks – enabling zero-shot spatial
